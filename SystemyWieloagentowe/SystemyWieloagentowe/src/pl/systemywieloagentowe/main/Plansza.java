@@ -13,8 +13,8 @@ public class Plansza extends JFrame implements Runnable {
 	int INC = 0;
 	int DEC = PLANSZA_LENGTH - 1;
 	int TIME = 5;
-	int STOP_RIGHT=5;
-	boolean ZATRZYMANIE_RIGHT=false;
+	int STOP_RIGHT = 5;
+	boolean ZATRZYMANIE_RIGHT = false;
 	Samochod mSamochodRight;
 	Samochod mSamochodLeft;
 	Karetka mKaretkaRight;
@@ -29,6 +29,7 @@ public class Plansza extends JFrame implements Runnable {
 
 	public Plansza() {
 		mKaretkaRight = new Karetka();
+		mKaretkaLeft = new Karetka();
 		mSamochodRight = new Samochod(2);
 		mSamochodRight.setmPoleX(4);
 		mSamochodLeft = new Samochod(1);
@@ -40,7 +41,7 @@ public class Plansza extends JFrame implements Runnable {
 
 		RysujPlansze();
 
-		//losujBlokadeRight();
+		// losujBlokadeRight();
 		losujPolicjeRight();
 		losujBlokadeLeft();
 
@@ -52,20 +53,15 @@ public class Plansza extends JFrame implements Runnable {
 
 	}
 
-	
-	
-	
-	public void losujPolicjeRight()
-	{
+	public void losujPolicjeRight() {
 		Random random = new Random();
 
 		int przeszkoda = random.nextInt(15) + 3;
 		Plansza[5][przeszkoda].setBlokada(true);
 		Plansza[5][przeszkoda].ChangeBackgroundImage("src/img/policja.png");
-		mPolicjaRight = new Policja();	
+		mPolicjaRight = new Policja();
 	}
-	
-	
+
 	public void losujBlokadeRight() {
 		Random random = new Random();
 
@@ -81,50 +77,53 @@ public class Plansza extends JFrame implements Runnable {
 		int przeszkoda = random.nextInt(15) + 3;
 		Plansza[1][przeszkoda].setBlokada(true);
 		Plansza[1][przeszkoda].ChangeBackgroundImage("src/img/blokada.png");
-		mKaretkaLeft = new Karetka();
+
 	}
-	
-	
-	
-	
-	public void SprawszPolicja()
-	{
-		if (Plansza[5][INC + 1].getBlokada()) {
-			ZATRZYMANIE_RIGHT=true;
+
+	public void SprawszPolicja() {
+		if ((Plansza[5][INC + 1].getBlokada())
+				&& (mSamochodRight.getmPredkosc() >= 2)) {
+			ZATRZYMANIE_RIGHT = true;
 			mSamochodRight.setmPoleX(5);
-		}			
+		} else if ((Plansza[5][INC + 2].getBlokada())
+				&& (mSamochodRight.getmPredkosc() >= 2)) {
+			ZATRZYMANIE_RIGHT = true;
+			mSamochodRight.setmPoleX(5);
+
+		}
 	}
-	
 
 	public void SprawdzPoleBlokada() {
 		Random random = new Random();
-		if (mSamochodRight
-				.SprawdzBlokade(Plansza[mSamochodRight.getmPoleX()][INC + 1]
-						.getBlokada())) {
 
-			int WezwijRight = random.nextInt(10);
-			if (WezwijRight > 7) {
-				if (!mKaretkaRight.getByla()) {
-					mKaretkaRight.setmPoleX(mSamochodRight.getmPoleX() + 1);
-					mKaretkaRight.setmPoleY(INC);
-					Plansza[mKaretkaRight.getmPoleX()][mKaretkaRight
-							.getmPoleY()]
-							.ChangeBackgroundImage("src/img/karetka.png");
-					mKaretkaRight.setByla(true);
+		if (!ZATRZYMANIE_RIGHT) {
+			if (mSamochodRight.SprawdzBlokade(Plansza[mSamochodRight
+					.getmPoleX()][INC + 1].getBlokada())) {
+
+				int WezwijRight = random.nextInt(10);
+				if (WezwijRight > 7) {
+					if (!mKaretkaRight.getByla()) {
+						mKaretkaRight.setmPoleX(mSamochodRight.getmPoleX() + 1);
+						mKaretkaRight.setmPoleY(INC);
+						Plansza[mKaretkaRight.getmPoleX()][mKaretkaRight
+								.getmPoleY()]
+								.ChangeBackgroundImage("src/img/karetka.png");
+						mKaretkaRight.setByla(true);
+					}
 				}
-			}
-		} else if (mSamochodRight.SprawdzBlokade(Plansza[mSamochodRight
-				.getmPoleX()][INC + 2].getBlokada())) {
+			} else if (mSamochodRight.SprawdzBlokade(Plansza[mSamochodRight
+					.getmPoleX()][INC + 2].getBlokada())) {
 
-			int WezwijRight = random.nextInt(10);
-			if (WezwijRight > 7) {
-				if (!mKaretkaRight.getByla()) {
-					mKaretkaRight.setmPoleX(mSamochodRight.getmPoleX() + 1);
-					mKaretkaRight.setmPoleY(INC + 1);
-					Plansza[mKaretkaRight.getmPoleX()][mKaretkaRight
-							.getmPoleY()]
-							.ChangeBackgroundImage("src/img/karetka.png");
-					mKaretkaRight.setByla(true);
+				int WezwijRight = random.nextInt(10);
+				if (WezwijRight > 7) {
+					if (!mKaretkaRight.getByla()) {
+						mKaretkaRight.setmPoleX(mSamochodRight.getmPoleX() + 1);
+						mKaretkaRight.setmPoleY(INC + 1);
+						Plansza[mKaretkaRight.getmPoleX()][mKaretkaRight
+								.getmPoleY()]
+								.ChangeBackgroundImage("src/img/karetka.png");
+						mKaretkaRight.setByla(true);
+					}
 				}
 			}
 		}
@@ -185,7 +184,7 @@ public class Plansza extends JFrame implements Runnable {
 			Plansza[5][i].ChangeBackgroundImage("src/img/pobocze.png");
 			Plansza[5][i].setBlokada(false);
 		}
-		//mKaretkaRight.setByla(false);
+		mKaretkaRight.setByla(false);
 		mKaretkaLeft.setByla(false);
 	}
 
@@ -241,22 +240,19 @@ public class Plansza extends JFrame implements Runnable {
 
 		while (true) {
 
-		
+			SprawdzPoleBlokada();
 
-		
-			
 			SprawszPolicja();
-		
+
 			mSamochodRight.setmPoleY(INC);
 			mSamochodLeft.setmPoleY(DEC);
 
-
 			Plansza[mSamochodRight.getmPoleX()][INC]
 					.ChangeBackgroundImage("src/img/samochod.png");
-			
+
 			Plansza[mSamochodLeft.getmPoleX()][DEC]
-				
-					.ChangeBackgroundImage("src/img/samochod2.png");
+
+			.ChangeBackgroundImage("src/img/samochod2.png");
 
 			try {
 				watek.sleep(150);
@@ -265,22 +261,19 @@ public class Plansza extends JFrame implements Runnable {
 				e.printStackTrace();
 			}
 
-	
 			Plansza[mSamochodLeft.getmPoleX()][DEC].Clear();
 			Plansza[mSamochodRight.getmPoleX()][INC].Clear();
 
-			if (!ZATRZYMANIE_RIGHT)
-			{
-		
+			if (!ZATRZYMANIE_RIGHT) {
+
 				INC = INC + mSamochodRight.getmPredkosc();
+			} else {
+				STOP_RIGHT--;
+				if (STOP_RIGHT == 0) {
+					ZATRZYMANIE_RIGHT = false;
+				}
 			}
-			else
-			{
-				SprawdzPoleBlokada();
-			}
-		
-			
-		
+
 			DEC = DEC - mSamochodLeft.getmPredkosc();
 			frame.repaint();
 
@@ -290,14 +283,12 @@ public class Plansza extends JFrame implements Runnable {
 				mSamochodLeft.setmPredkosc();
 			}
 
-			
-		
 			if (INC >= 23) {
 
 				TIME--;
 				if (TIME == 0) {
 					CzyscPlansze();
-					//losujBlokadeRight();
+					// losujBlokadeRight();
 					losujPolicjeRight();
 					losujBlokadeLeft();
 					TIME = 5;
@@ -308,8 +299,6 @@ public class Plansza extends JFrame implements Runnable {
 				mSamochodRight.setmPredkosc();
 
 			}
-			
-	
 
 		}
 		// TODO Auto-generated method stub
