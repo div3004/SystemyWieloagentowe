@@ -62,4 +62,9 @@ public class Samochod {
 		mPredkosc = random.nextInt(2) + 1;
 	}
 
+	
+	
+	
+	
+	
 }
