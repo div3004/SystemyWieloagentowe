@@ -14,6 +14,10 @@ public class JPanelGraphic extends JPanel {
 
 	private BufferedImage background;
 
+	private boolean blokada=false;
+	
+	
+	
 	public JPanelGraphic(String Path) {
 		try {
 			background = ImageIO.read(new File(Path));
@@ -21,6 +25,7 @@ public class JPanelGraphic extends JPanel {
 
 		}
 		this.setPreferredSize(new Dimension(50, 50));
+
 	}
 
 	
@@ -29,6 +34,16 @@ public class JPanelGraphic extends JPanel {
 		return background;
 	}
 	
+	
+	public void setBlokada(boolean blokada) {
+		this.blokada = blokada;
+	}
+	
+	public boolean getBlokada() {
+		// TODO Auto-generated method stub
+		return blokada;
+
+	}
 	
 	
 	public void Clear()
