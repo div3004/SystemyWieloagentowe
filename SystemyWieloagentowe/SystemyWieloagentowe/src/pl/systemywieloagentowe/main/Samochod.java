@@ -7,9 +7,11 @@ public class Samochod {
 	int mPredkosc;
 	int mPoleX;
 	int mPoleY;
+	int mRodzaj;
 
-	public Samochod() {
+	public Samochod(int Rodzaj) {
 		setmPredkosc();
+		mRodzaj=Rodzaj;
 	}
 	
 	
@@ -17,8 +19,14 @@ public class Samochod {
 	{
 		if (Pole)
 		{
-	
+		if (mRodzaj==2)
+		{
 		mPoleX=mPoleX-1;
+		}
+		else
+		{
+		mPoleX=mPoleX+1;	
+		}
 		return true;
 		} else
 		{

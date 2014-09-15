@@ -12,9 +12,11 @@ public class Plansza extends JFrame implements Runnable {
 	int PLANSZA_LENGTH = 25;
 	int INC = 0;
 	int DEC = PLANSZA_LENGTH - 1;
-
-	Samochod mSamochod;
-
+	int TIME = 5;
+	Samochod mSamochodRight;
+	Samochod mSamochodLeft;
+	Karetka mKaretkaRight;
+	Karetka mKaretkaLeft;
 	private Thread watek;
 
 	JPanelGraphic[][] Plansza = new JPanelGraphic[6][PLANSZA_LENGTH];
@@ -24,8 +26,10 @@ public class Plansza extends JFrame implements Runnable {
 
 	public Plansza() {
 
-		mSamochod = new Samochod();
-		mSamochod.setmPoleX(4);
+		mSamochodRight = new Samochod(2);
+		mSamochodRight.setmPoleX(4);
+		mSamochodLeft = new Samochod(1);
+		mSamochodLeft.setmPoleX(1);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setPreferredSize(new Dimension(1100, 600));
 
@@ -33,9 +37,9 @@ public class Plansza extends JFrame implements Runnable {
 
 		RysujPlansze();
 
-		losujBlokade();
-		
-		
+		losujBlokadeRight();
+		losujBlokadeLeft();
+
 		watek = new Thread(this);
 		watek.start();
 
@@ -43,32 +47,106 @@ public class Plansza extends JFrame implements Runnable {
 		frame.setVisible(true);
 
 	}
-	
-	
-	
-	
-   public void losujBlokade()
-   {
-	   Random random = new Random();
-	   int przeszkoda = random.nextInt(20);
-	   Plansza[4][przeszkoda].setBlokada(true);
-	   Plansza[4][przeszkoda].ChangeBackgroundImage("src/img/blokada.png");
-   }
-	
 
-   
-    public void SprawdzPole()
-    {
-    	
-     mSamochod.SprawdzBlokade(Plansza[mSamochod.getmPoleX()][INC+1].getBlokada());
-     mSamochod.SprawdzBlokade(Plansza[mSamochod.getmPoleX()][INC+2].getBlokada());
-    	 
- 
-     
-    }
-   
-   
-   
+	public void losujBlokadeRight() {
+		Random random = new Random();
+
+		int przeszkoda = random.nextInt(15)+3;
+		Plansza[4][przeszkoda].setBlokada(true);
+		Plansza[4][przeszkoda].ChangeBackgroundImage("src/img/blokada.png");
+		mKaretkaRight = new Karetka();
+	}
+	
+	public void losujBlokadeLeft() {
+		Random random = new Random();
+
+		int przeszkoda = random.nextInt(15)+3;
+		Plansza[1][przeszkoda].setBlokada(true);
+		Plansza[1][przeszkoda].ChangeBackgroundImage("src/img/blokada.png");
+		mKaretkaLeft = new Karetka();
+	}
+
+	public void SprawdzPoleBlokada() {
+
+		if (mSamochodRight.SprawdzBlokade(Plansza[mSamochodRight.getmPoleX()][INC + 1]
+				.getBlokada())) {
+			if (!mKaretkaRight.getByla()) {
+				mKaretkaRight.setmPoleX(mSamochodRight.getmPoleX() + 1);
+				mKaretkaRight.setmPoleY(INC);
+				Plansza[mKaretkaRight.getmPoleX()][mKaretkaRight.getmPoleY()]
+						.ChangeBackgroundImage("src/img/karetka.png");
+				mKaretkaRight.setByla(true);
+			}
+		} else if (mSamochodRight
+				.SprawdzBlokade(Plansza[mSamochodRight.getmPoleX()][INC + 2]
+						.getBlokada())) {
+			if (!mKaretkaRight.getByla()) {
+				mKaretkaRight.setmPoleX(mSamochodRight.getmPoleX() + 1);
+				mKaretkaRight.setmPoleY(INC + 1);
+				Plansza[mKaretkaRight.getmPoleX()][mKaretkaRight.getmPoleY()]
+						.ChangeBackgroundImage("src/img/karetka.png");
+				mKaretkaRight.setByla(true);
+			}
+		}
+		
+		if (DEC>2)
+		{
+		if (mSamochodLeft.SprawdzBlokade(Plansza[mSamochodLeft.getmPoleX()][DEC - 1]
+				.getBlokada())) {
+			if (!mKaretkaLeft.getByla()) {
+				mKaretkaLeft.setmPoleX(mSamochodLeft.getmPoleX() - 1);
+				mKaretkaLeft.setmPoleY(DEC-2);
+				Plansza[mKaretkaLeft.getmPoleX()][mKaretkaLeft.getmPoleY()]
+						.ChangeBackgroundImage("src/img/karetka.png");
+				mKaretkaLeft.setByla(true);
+			}
+		} else if (mSamochodLeft
+				.SprawdzBlokade(Plansza[mSamochodLeft.getmPoleX()][DEC - 2]
+						.getBlokada())) {
+			if (!mKaretkaLeft.getByla()) {
+				mKaretkaLeft.setmPoleX(mSamochodLeft.getmPoleX() - 1);
+				mKaretkaLeft.setmPoleY(DEC-3);
+				Plansza[mKaretkaLeft.getmPoleX()][mKaretkaLeft.getmPoleY()]
+						.ChangeBackgroundImage("src/img/karetka.png");
+				mKaretkaLeft.setByla(true);
+			}
+		}
+		}
+		
+		
+		
+		
+		
+		
+
+	}
+
+	public void CzyscPlansze() {
+		for (int i = 0; i < PLANSZA_LENGTH; i++) {
+			Plansza[0][i].ChangeBackgroundImage("src/img/pobocze.png");
+			Plansza[0][i].setBlokada(false);
+		}
+		for (int i = 1; i <= 2; i++) {
+			for (int j = 0; j < PLANSZA_LENGTH; j++) {
+				Plansza[i][j].ChangeBackgroundImage("src/img/droga.png");
+				Plansza[i][j].setBlokada(false);
+			}
+
+		}
+		for (int i = 3; i <= 4; i++) {
+			for (int j = 0; j < PLANSZA_LENGTH; j++) {
+				Plansza[i][j].ChangeBackgroundImage("src/img/droga.png");
+				Plansza[i][j].setBlokada(false);
+			}
+		}
+		for (int i = 0; i < PLANSZA_LENGTH; i++) {
+			Plansza[5][i].ChangeBackgroundImage("src/img/pobocze.png");
+			Plansza[5][i].setBlokada(false);
+		}
+		mKaretkaRight.setByla(false);
+		mKaretkaLeft.setByla(false);
+	}
+
 	public void RysujPlansze() {
 
 		for (int i = 0; i < PLANSZA_LENGTH; i++) {
@@ -121,17 +199,19 @@ public class Plansza extends JFrame implements Runnable {
 
 		while (true) {
 
+			SprawdzPoleBlokada();
+
+			mSamochodRight.setmPoleY(INC);
+			mSamochodLeft.setmPoleY(DEC);
 			
 			
+			Plansza[mSamochodRight.getmPoleX()][INC]
+					.ChangeBackgroundImage("src/img/samochod.png");
 			
-			SprawdzPole();
-	
-			mSamochod.setmPoleY(INC);
+			Plansza[mSamochodLeft.getmPoleX()][DEC]
+					.ChangeBackgroundImage("src/img/samochod2.png");
 			
-			
-			
-			Plansza[mSamochod.getmPoleX()][INC].ChangeBackgroundImage("src/img/samochod.png");
-			Plansza[1][DEC].ChangeBackgroundImage("src/img/samochod2.png");
+
 			try {
 				watek.sleep(150);
 
@@ -139,20 +219,36 @@ public class Plansza extends JFrame implements Runnable {
 				e.printStackTrace();
 			}
 
-			Plansza[mSamochod.getmPoleX()][INC].Clear();
-			Plansza[1][DEC].Clear();
-			INC=INC+mSamochod.getmPredkosc();
-			DEC--;
+			Plansza[mSamochodRight.getmPoleX()][INC].Clear();
+			Plansza[mSamochodLeft.getmPoleX()][DEC].Clear();
+			
+			
+			
+
+			INC = INC + mSamochodRight.getmPredkosc();
+			DEC = DEC - mSamochodLeft.getmPredkosc();
 			frame.repaint();
 
-			if (DEC == 0) {
+			if (DEC < 0) {
 				DEC = 21;
+				mSamochodLeft.setmPoleX(1);
+				mSamochodLeft.setmPredkosc();
 			}
 
 			if (INC >= 23) {
+
+				TIME--;
+				if (TIME == 0) {
+					CzyscPlansze();
+					losujBlokadeRight();
+					losujBlokadeLeft();
+					TIME = 5;
+				}
+
 				INC = 0;
-				mSamochod.setmPoleX(4);
-				mSamochod.setmPredkosc();
+				mSamochodRight.setmPoleX(4);
+				mSamochodRight.setmPredkosc();
+
 			}
 
 		}

@@ -9,6 +9,7 @@ public class Karetka {
 	
 	
 	
+	
 	public void setmPoleX(int mPoleX) {
 		this.mPoleX = mPoleX;
 	}
