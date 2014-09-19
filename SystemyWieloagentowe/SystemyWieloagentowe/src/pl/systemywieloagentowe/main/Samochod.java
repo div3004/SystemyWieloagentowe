@@ -4,10 +4,10 @@ import java.util.Random;
 
 public class Samochod {
 
-	int mPredkosc;
-	int mPoleX;
-	int mPoleY;
-	int mRodzaj;
+	private int mPredkosc;
+	private int mPoleX;
+	private int mPoleY;
+	private int mRodzaj;
 
 	public Samochod(int Rodzaj) {
 		setmPredkosc();
@@ -63,6 +63,9 @@ public class Samochod {
 	}
 
 	
+	public void setmPredkosc(int predkosc) {
+		this.mPredkosc=predkosc;
+	}	
 	
 	
 	

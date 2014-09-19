@@ -1,11 +1,17 @@
 package pl.systemywieloagentowe.main;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.Random;
 
+import javax.swing.Box;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 public class Plansza extends JFrame implements Runnable {
 
@@ -15,15 +21,25 @@ public class Plansza extends JFrame implements Runnable {
 	int TIME = 5;
 	int STOP_RIGHT = 5;
 	boolean ZATRZYMANIE_RIGHT = false;
+	int STOP_LEFT = 5;
+	boolean ZATRZYMANIE_LEFT = false;
 	Samochod mSamochodRight;
 	Samochod mSamochodLeft;
 	Karetka mKaretkaRight;
 	Karetka mKaretkaLeft;
 	Policja mPolicjaRight;
+	Policja mPolicjaLeft;
 	private Thread watek;
 
 	JPanelGraphic[][] Plansza = new JPanelGraphic[6][PLANSZA_LENGTH];
-
+	JPanel mplanszaPanel = new JPanel(new GridBagLayout());
+	JPanel mStatystykiPanel = new JPanel(new GridBagLayout());
+	JTextArea textAreaPolicja = new JTextArea(12, 24);
+	JScrollPane scrollPanePolicja = new JScrollPane(textAreaPolicja);
+	JTextArea textAreaKaretka = new JTextArea(12, 35);
+	JScrollPane scrollPaneKaretka = new JScrollPane(textAreaKaretka);
+	JTextArea textAreaFotoradar = new JTextArea(12, 24);
+	JScrollPane scrollPaneFotoradar = new JScrollPane(textAreaFotoradar);
 	GridBagConstraints c = new GridBagConstraints();
 	JFrame frame = new JFrame("Systemy Wieloagentowe");
 
@@ -36,21 +52,92 @@ public class Plansza extends JFrame implements Runnable {
 		mSamochodLeft.setmPoleX(1);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setPreferredSize(new Dimension(1100, 600));
-
-		frame.setLayout(new GridBagLayout());
+		textAreaPolicja.enable(false);
+		textAreaKaretka.enable(false);
+		textAreaFotoradar.enable(false);
+		frame.setLayout(new BorderLayout());
 
 		RysujPlansze();
+		RysujStatystyki();
+
+		Random losuj = new Random();
+		int left = losuj.nextInt(2) + 1;
+		int right = losuj.nextInt(2) + 1;
 
 		// losujBlokadeRight();
-		losujPolicjeRight();
-		losujBlokadeLeft();
+
+		switch (left) {
+		case 1:
+			losujBlokadeLeft();
+			break;
+		case 2:
+			losujPolicjeLeft();
+			break;
+		}
+
+		switch (right) {
+		case 1:
+			losujBlokadeRight();
+			break;
+		case 2:
+			losujPolicjeRight();
+			break;
+		}
+
+		// losujBlokadeRight();
+		// losujPolicjeRight();
+		// losujBlokadeLeft();
+		// losujPolicjeLeft();
+
+		frame.add(mplanszaPanel, BorderLayout.CENTER);
 
 		watek = new Thread(this);
 		watek.start();
 
+		frame.add(mStatystykiPanel, BorderLayout.SOUTH);
+
 		frame.pack();
 		frame.setVisible(true);
 
+	}
+
+	public void RysujStatystyki() {
+
+		JLabel label1 = new JLabel("Lista mandatów policji: ");
+		c.gridx = 0;
+		c.gridy = 0;
+		mStatystykiPanel.add(label1, c);
+
+		c.gridx = 1;
+		c.gridy = 1;
+		mStatystykiPanel.add(Box.createHorizontalStrut(65), c);
+
+		JLabel label2 = new JLabel("Czy wezwano karetkê?");
+		c.gridx = 2;
+		c.gridy = 0;
+		mStatystykiPanel.add(label2, c);
+
+		c.gridx = 3;
+		c.gridy = 1;
+		mStatystykiPanel.add(Box.createHorizontalStrut(65), c);
+
+		JLabel label3 = new JLabel("Lista mandatów Fotoradar: ");
+		c.gridx = 4;
+		c.gridy = 0;
+		mStatystykiPanel.add(label3, c);
+
+		c.gridx = 0;
+		c.gridy = 1;
+		mStatystykiPanel.add(scrollPanePolicja, c);
+		c.gridx = 2;
+		c.gridy = 1;
+		mStatystykiPanel.add(scrollPaneKaretka, c);
+		c.gridx = 4;
+		c.gridy = 1;
+		mStatystykiPanel.add(scrollPaneFotoradar, c);
+		c.gridx = 0;
+		c.gridy = 3;
+		mStatystykiPanel.add(Box.createVerticalStrut(40), c);
 	}
 
 	public void losujPolicjeRight() {
@@ -60,6 +147,15 @@ public class Plansza extends JFrame implements Runnable {
 		Plansza[5][przeszkoda].setBlokada(true);
 		Plansza[5][przeszkoda].ChangeBackgroundImage("src/img/policja.png");
 		mPolicjaRight = new Policja();
+	}
+
+	public void losujPolicjeLeft() {
+		Random random = new Random();
+
+		int przeszkoda = random.nextInt(15) + 3;
+		Plansza[0][przeszkoda].setBlokada(true);
+		Plansza[0][przeszkoda].ChangeBackgroundImage("src/img/policja2.png");
+		mPolicjaLeft = new Policja();
 	}
 
 	public void losujBlokadeRight() {
@@ -80,15 +176,94 @@ public class Plansza extends JFrame implements Runnable {
 
 	}
 
-	public void SprawszPolicja() {
-		if ((Plansza[5][INC + 1].getBlokada())
-				&& (mSamochodRight.getmPredkosc() >= 2)) {
-			ZATRZYMANIE_RIGHT = true;
-			mSamochodRight.setmPoleX(5);
-		} else if ((Plansza[5][INC + 2].getBlokada())
-				&& (mSamochodRight.getmPredkosc() >= 2)) {
-			ZATRZYMANIE_RIGHT = true;
-			mSamochodRight.setmPoleX(5);
+	public void SprawszPolicjaLeft() {
+		if (DEC > 2) {
+			if (!ZATRZYMANIE_LEFT) {
+
+				if ((Plansza[0][DEC - 1].getBlokada())
+						&& (mSamochodLeft.getmPredkosc() >= 2)) {
+					ZATRZYMANIE_LEFT = true;
+
+					Random losuj = new Random();
+					int kwota = losuj.nextInt(5) + 1;
+
+					textAreaPolicja.append("Kierowca 1 otrzyma³ mandat: "
+							+ kwota + "00 PLN\n");
+
+					mSamochodLeft.setmPoleX(0);
+				} else if ((Plansza[0][DEC - 2].getBlokada())
+						&& (mSamochodLeft.getmPredkosc() >= 2)) {
+					ZATRZYMANIE_LEFT = true;
+
+					Random losuj = new Random();
+					int kwota = losuj.nextInt(5) + 1;
+
+					textAreaPolicja.append("Kierowca 1 otrzyma³ mandat: "
+							+ kwota + "00 PLN\n");
+
+					mSamochodLeft.setmPoleX(0);
+
+				}
+			} else {
+				STOP_LEFT--;
+				if (STOP_LEFT <= 0) {
+
+					ZATRZYMANIE_LEFT = false;
+					STOP_LEFT = 5;
+
+					mSamochodLeft.setmPoleX(1);
+					Plansza[0][DEC]
+							.ChangeBackgroundImage("src/img/pobocze.png");
+
+					mSamochodLeft.setmPredkosc(1);
+
+				}
+
+			}
+		}
+	}
+
+	public void SprawszPolicjaRight() {
+
+		if (!ZATRZYMANIE_RIGHT) {
+
+			if ((Plansza[5][INC + 1].getBlokada())
+					&& (mSamochodRight.getmPredkosc() >= 2)) {
+				ZATRZYMANIE_RIGHT = true;
+				mSamochodRight.setmPoleX(5);
+
+				Random losuj = new Random();
+				int kwota = losuj.nextInt(5) + 1;
+
+				textAreaPolicja.append("Kierowca 2 otrzyma³ mandat: " + kwota
+						+ "00 PLN\n");
+
+			} else if ((Plansza[5][INC + 2].getBlokada())
+					&& (mSamochodRight.getmPredkosc() >= 2)) {
+				ZATRZYMANIE_RIGHT = true;
+
+				Random losuj = new Random();
+				int kwota = losuj.nextInt(5) + 1;
+
+				textAreaPolicja.append("Kierowca 2 otrzyma³ mandat: " + kwota
+						+ "00 PLN\n");
+
+				mSamochodRight.setmPoleX(5);
+
+			}
+		} else {
+			STOP_RIGHT--;
+			if (STOP_RIGHT <= 0) {
+
+				ZATRZYMANIE_RIGHT = false;
+				STOP_RIGHT = 5;
+
+				mSamochodRight.setmPoleX(4);
+				Plansza[5][INC].ChangeBackgroundImage("src/img/pobocze.png");
+
+				mSamochodRight.setmPredkosc(1);
+
+			}
 
 		}
 	}
@@ -109,9 +284,25 @@ public class Plansza extends JFrame implements Runnable {
 								.getmPoleY()]
 								.ChangeBackgroundImage("src/img/karetka.png");
 						mKaretkaRight.setByla(true);
+						textAreaKaretka
+								.append("Kierowca 2: TAK,Karetka zosta³a wezwana\n");
+					} else {
+
+						textAreaKaretka
+								.append("Kierowca 2:  chcia³ wezwaæ,ale\nkaretka ju¿ jest\n");
+
+					}
+
+				} else {
+					if (!mKaretkaRight.getByla()) {
+						textAreaKaretka
+								.append("Kierowca 2: NIE,Karetka niezosta³a wezwana\n");
 					}
 				}
-			} else if (mSamochodRight.SprawdzBlokade(Plansza[mSamochodRight
+
+			}
+
+			else if (mSamochodRight.SprawdzBlokade(Plansza[mSamochodRight
 					.getmPoleX()][INC + 2].getBlokada())) {
 
 				int WezwijRight = random.nextInt(10);
@@ -123,38 +314,74 @@ public class Plansza extends JFrame implements Runnable {
 								.getmPoleY()]
 								.ChangeBackgroundImage("src/img/karetka.png");
 						mKaretkaRight.setByla(true);
+						textAreaKaretka
+								.append("Kierowca 2: TAK,Karetka zosta³a wezwana\n");
+					} else {
+
+						textAreaKaretka
+								.append("Kierowca 2:  chcia³ wezwaæ,ale\nkaretka ju¿ jest\n");
+
+					}
+
+				} else {
+					if (!mKaretkaRight.getByla()) {
+						textAreaKaretka
+								.append("Kierowca 2: NIE,Karetka niezosta³a wezwana\n");
 					}
 				}
 			}
 		}
 
 		if (DEC > 2) {
-			if (mSamochodLeft
-					.SprawdzBlokade(Plansza[mSamochodLeft.getmPoleX()][DEC - 1]
-							.getBlokada())) {
+			if (!ZATRZYMANIE_LEFT) {
+				if (mSamochodLeft.SprawdzBlokade(Plansza[mSamochodLeft
+						.getmPoleX()][DEC - 1].getBlokada())) {
 
-				int WezwijLeft = random.nextInt(10);
-				if (WezwijLeft > 7) {
-					if (!mKaretkaLeft.getByla()) {
-						mKaretkaLeft.setmPoleX(mSamochodLeft.getmPoleX() - 1);
-						mKaretkaLeft.setmPoleY(DEC - 2);
-						Plansza[mKaretkaLeft.getmPoleX()][mKaretkaLeft
-								.getmPoleY()]
-								.ChangeBackgroundImage("src/img/karetka.png");
-						mKaretkaLeft.setByla(true);
+					int WezwijLeft = random.nextInt(10);
+					if (WezwijLeft > 7) {
+						if (!mKaretkaLeft.getByla()) {
+							mKaretkaLeft
+									.setmPoleX(mSamochodLeft.getmPoleX() - 1);
+							mKaretkaLeft.setmPoleY(DEC - 2);
+							Plansza[mKaretkaLeft.getmPoleX()][mKaretkaLeft
+									.getmPoleY()]
+									.ChangeBackgroundImage("src/img/karetka.png");
+							mKaretkaLeft.setByla(true);
+							textAreaKaretka
+									.append("Kierowca 1: TAK,Karetka zosta³a wezwana\n");
+						} else {
+							textAreaKaretka
+									.append("Kierowca 1: chcia³ wezwaæ,ale\nkaretka ju¿ jest\n");
+						}
+					} else {
+						if (!mKaretkaLeft.getByla()) {
+							textAreaKaretka
+									.append("Kierowca 1: NIE,Karetka niezosta³a wezwana\n");
+						}
 					}
-				}
-			} else if (mSamochodLeft.SprawdzBlokade(Plansza[mSamochodLeft
-					.getmPoleX()][DEC - 2].getBlokada())) {
-				int WezwijLeft = random.nextInt(10);
-				if (WezwijLeft > 7) {
-					if (!mKaretkaLeft.getByla()) {
-						mKaretkaLeft.setmPoleX(mSamochodLeft.getmPoleX() - 1);
-						mKaretkaLeft.setmPoleY(DEC - 3);
-						Plansza[mKaretkaLeft.getmPoleX()][mKaretkaLeft
-								.getmPoleY()]
-								.ChangeBackgroundImage("src/img/karetka.png");
-						mKaretkaLeft.setByla(true);
+				} else if (mSamochodLeft.SprawdzBlokade(Plansza[mSamochodLeft
+						.getmPoleX()][DEC - 2].getBlokada())) {
+					int WezwijLeft = random.nextInt(10);
+					if (WezwijLeft > 7) {
+						if (!mKaretkaLeft.getByla()) {
+							mKaretkaLeft
+									.setmPoleX(mSamochodLeft.getmPoleX() - 1);
+							mKaretkaLeft.setmPoleY(DEC - 3);
+							Plansza[mKaretkaLeft.getmPoleX()][mKaretkaLeft
+									.getmPoleY()]
+									.ChangeBackgroundImage("src/img/karetka.png");
+							mKaretkaLeft.setByla(true);
+							textAreaKaretka
+									.append("Kierowca 1: TAK,Karetka zosta³a wezwana\n");
+						} else {
+							textAreaKaretka
+									.append("Kierowca 1: chcia³ wezwaæ,ale\nkaretka ju¿ jest\n");
+						}
+					} else {
+						if (!mKaretkaLeft.getByla()) {
+							textAreaKaretka
+									.append("Kierowca 1: NIE,Karetka niezosta³a wezwana\n");
+						}
 					}
 				}
 			}
@@ -196,7 +423,7 @@ public class Plansza extends JFrame implements Runnable {
 			if (i <= PLANSZA_LENGTH - 5) {
 				c.gridx = i;
 				c.gridy = 0;
-				frame.add(Plansza[0][i], c);
+				mplanszaPanel.add(Plansza[0][i], c);
 			}
 		}
 
@@ -206,7 +433,7 @@ public class Plansza extends JFrame implements Runnable {
 				if (j <= PLANSZA_LENGTH - 5) {
 					c.gridx = j;
 					c.gridy = i;
-					frame.add(Plansza[i][j], c);
+					mplanszaPanel.add(Plansza[i][j], c);
 				}
 			}
 
@@ -218,7 +445,7 @@ public class Plansza extends JFrame implements Runnable {
 				if (j <= PLANSZA_LENGTH - 5) {
 					c.gridx = j;
 					c.gridy = i;
-					frame.add(Plansza[i][j], c);
+					mplanszaPanel.add(Plansza[i][j], c);
 				}
 			}
 
@@ -229,7 +456,7 @@ public class Plansza extends JFrame implements Runnable {
 			if (i <= PLANSZA_LENGTH - 5) {
 				c.gridx = i;
 				c.gridy = 5;
-				frame.add(Plansza[5][i], c);
+				mplanszaPanel.add(Plansza[5][i], c);
 			}
 		}
 
@@ -241,8 +468,8 @@ public class Plansza extends JFrame implements Runnable {
 		while (true) {
 
 			SprawdzPoleBlokada();
-
-			SprawszPolicja();
+			SprawszPolicjaLeft();
+			SprawszPolicjaRight();
 
 			mSamochodRight.setmPoleY(INC);
 			mSamochodLeft.setmPoleY(DEC);
@@ -267,15 +494,14 @@ public class Plansza extends JFrame implements Runnable {
 			if (!ZATRZYMANIE_RIGHT) {
 
 				INC = INC + mSamochodRight.getmPredkosc();
-			} else {
-				STOP_RIGHT--;
-				if (STOP_RIGHT == 0) {
-					ZATRZYMANIE_RIGHT = false;
-				}
 			}
 
-			DEC = DEC - mSamochodLeft.getmPredkosc();
-			frame.repaint();
+			if (!ZATRZYMANIE_LEFT) {
+
+				DEC = DEC - mSamochodLeft.getmPredkosc();
+			}
+
+			mplanszaPanel.repaint();
 
 			if (DEC < 0) {
 				DEC = 21;
@@ -288,9 +514,37 @@ public class Plansza extends JFrame implements Runnable {
 				TIME--;
 				if (TIME == 0) {
 					CzyscPlansze();
+
+					Random losuj = new Random();
+					int left = losuj.nextInt(2) + 1;
+					int right = losuj.nextInt(2) + 1;
+
 					// losujBlokadeRight();
-					losujPolicjeRight();
-					losujBlokadeLeft();
+
+					switch (left) {
+					case 1:
+						losujBlokadeLeft();
+						break;
+					case 2:
+						losujPolicjeLeft();
+						break;
+					}
+
+					switch (right) {
+					case 1:
+						losujBlokadeRight();
+						break;
+					case 2:
+						losujPolicjeRight();
+						break;
+					}
+
+					// losujPolicjeRight();
+					// losujPolicjeLeft();
+					// losujBlokadeLeft();
+					textAreaKaretka.setText("");
+					textAreaPolicja.setText("");
+					textAreaFotoradar.setText("");
 					TIME = 5;
 				}
 
