@@ -23,11 +23,14 @@ public class Plansza extends JFrame implements Runnable {
 	boolean ZATRZYMANIE_RIGHT = false;
 	int STOP_LEFT = 5;
 	boolean ZATRZYMANIE_LEFT = false;
+	boolean FOTORADAR_RIGHT = false;
+	boolean FOTORADAR_LEFT = false;
 	Samochod mSamochodRight;
 	Samochod mSamochodLeft;
 	Karetka mKaretkaRight;
 	Karetka mKaretkaLeft;
 	Policja mPolicjaRight;
+	Fotoradar mFotoradarRight;
 	Policja mPolicjaLeft;
 	private Thread watek;
 
@@ -50,6 +53,7 @@ public class Plansza extends JFrame implements Runnable {
 		mSamochodRight.setmPoleX(4);
 		mSamochodLeft = new Samochod(1);
 		mSamochodLeft.setmPoleX(1);
+		mFotoradarRight = new Fotoradar();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setPreferredSize(new Dimension(1100, 600));
 		textAreaPolicja.enable(false);
@@ -61,8 +65,8 @@ public class Plansza extends JFrame implements Runnable {
 		RysujStatystyki();
 
 		Random losuj = new Random();
-		int left = losuj.nextInt(2) + 1;
-		int right = losuj.nextInt(2) + 1;
+		int left = losuj.nextInt(3) + 1;
+		int right = losuj.nextInt(3) + 1;
 
 		// losujBlokadeRight();
 
@@ -73,6 +77,9 @@ public class Plansza extends JFrame implements Runnable {
 		case 2:
 			losujPolicjeLeft();
 			break;
+		case 3:
+			losujFotoradarLeft();
+			break;
 		}
 
 		switch (right) {
@@ -82,12 +89,10 @@ public class Plansza extends JFrame implements Runnable {
 		case 2:
 			losujPolicjeRight();
 			break;
+		case 3:
+			losujFotoradarRight();
+			break;
 		}
-
-		// losujBlokadeRight();
-		// losujPolicjeRight();
-		// losujBlokadeLeft();
-		// losujPolicjeLeft();
 
 		frame.add(mplanszaPanel, BorderLayout.CENTER);
 
@@ -99,6 +104,22 @@ public class Plansza extends JFrame implements Runnable {
 		frame.pack();
 		frame.setVisible(true);
 
+	}
+
+	public void losujFotoradarRight() {
+		Random random = new Random();
+		FOTORADAR_RIGHT = true;
+		int przeszkoda = random.nextInt(15) + 3;
+		Plansza[5][przeszkoda].setBlokada(true);
+		Plansza[5][przeszkoda].ChangeBackgroundImage("src/img/fotoradar.png");
+	}
+
+	public void losujFotoradarLeft() {
+		Random random = new Random();
+		FOTORADAR_LEFT = true;
+		int przeszkoda = random.nextInt(15) + 3;
+		Plansza[0][przeszkoda].setBlokada(true);
+		Plansza[0][przeszkoda].ChangeBackgroundImage("src/img/fotoradar2.png");
 	}
 
 	public void RysujStatystyki() {
@@ -147,6 +168,7 @@ public class Plansza extends JFrame implements Runnable {
 		Plansza[5][przeszkoda].setBlokada(true);
 		Plansza[5][przeszkoda].ChangeBackgroundImage("src/img/policja.png");
 		mPolicjaRight = new Policja();
+		FOTORADAR_RIGHT = false;
 	}
 
 	public void losujPolicjeLeft() {
@@ -156,11 +178,12 @@ public class Plansza extends JFrame implements Runnable {
 		Plansza[0][przeszkoda].setBlokada(true);
 		Plansza[0][przeszkoda].ChangeBackgroundImage("src/img/policja2.png");
 		mPolicjaLeft = new Policja();
+		FOTORADAR_LEFT = false;
 	}
 
 	public void losujBlokadeRight() {
 		Random random = new Random();
-
+		FOTORADAR_RIGHT = false;
 		int przeszkoda = random.nextInt(15) + 3;
 		Plansza[4][przeszkoda].setBlokada(true);
 		Plansza[4][przeszkoda].ChangeBackgroundImage("src/img/blokada.png");
@@ -169,7 +192,7 @@ public class Plansza extends JFrame implements Runnable {
 
 	public void losujBlokadeLeft() {
 		Random random = new Random();
-
+		FOTORADAR_LEFT = false;
 		int przeszkoda = random.nextInt(15) + 3;
 		Plansza[1][przeszkoda].setBlokada(true);
 		Plansza[1][przeszkoda].ChangeBackgroundImage("src/img/blokada.png");
@@ -223,7 +246,7 @@ public class Plansza extends JFrame implements Runnable {
 		}
 	}
 
-	public void SprawszPolicjaRight() {
+	public void SprawdzPolicjaRight() {
 
 		if (!ZATRZYMANIE_RIGHT) {
 
@@ -267,6 +290,40 @@ public class Plansza extends JFrame implements Runnable {
 
 		}
 	}
+
+	public void SprawdzFotoradarRight() {
+		if ((Plansza[5][INC + 1].getBlokada())
+				&& (mSamochodRight.getmPredkosc() >= 2)) {
+			textAreaFotoradar.append("Kierowca 2: otrzyma³ mandat: 200 PLN\n");
+
+			mSamochodRight.setmPredkosc(1);
+		} else if ((Plansza[5][INC + 2].getBlokada())
+				&& (mSamochodRight.getmPredkosc() >= 2)) {
+
+			textAreaFotoradar.append("Kierowca 2: otrzyma³ mandat: 200 PLN\n");
+			;
+			mSamochodRight.setmPredkosc(1);
+		}
+	};
+
+	public void SprawdzFotoradarLeft() {
+		if (DEC > 2) {
+			if ((Plansza[0][DEC - 1].getBlokada())
+					&& (mSamochodLeft.getmPredkosc() >= 2)) {
+				textAreaFotoradar
+						.append("Kierowca 1: otrzyma³ mandat: 200 PLN\n");
+
+				mSamochodLeft.setmPredkosc(1);
+			} else if ((Plansza[0][DEC - 2].getBlokada())
+					&& (mSamochodLeft.getmPredkosc() >= 2)) {
+
+				textAreaFotoradar
+						.append("Kierowca 1: otrzyma³ mandat: 200 PLN\n");
+				;
+				mSamochodLeft.setmPredkosc(1);
+			}
+		}
+	};
 
 	public void SprawdzPoleBlokada() {
 		Random random = new Random();
@@ -468,9 +525,17 @@ public class Plansza extends JFrame implements Runnable {
 		while (true) {
 
 			SprawdzPoleBlokada();
-			SprawszPolicjaLeft();
-			SprawszPolicjaRight();
+			if (!FOTORADAR_LEFT) {
+				SprawszPolicjaLeft();
+			} else {
+				SprawdzFotoradarLeft();
+			}
 
+			if (!FOTORADAR_RIGHT) {
+				SprawdzPolicjaRight();
+			} else {
+				SprawdzFotoradarRight();
+			}
 			mSamochodRight.setmPoleY(INC);
 			mSamochodLeft.setmPoleY(DEC);
 
@@ -517,7 +582,7 @@ public class Plansza extends JFrame implements Runnable {
 
 					Random losuj = new Random();
 					int left = losuj.nextInt(2) + 1;
-					int right = losuj.nextInt(2) + 1;
+					int right = losuj.nextInt(3) + 1;
 
 					// losujBlokadeRight();
 
@@ -536,6 +601,9 @@ public class Plansza extends JFrame implements Runnable {
 						break;
 					case 2:
 						losujPolicjeRight();
+						break;
+					case 3:
+						losujFotoradarRight();
 						break;
 					}
 
